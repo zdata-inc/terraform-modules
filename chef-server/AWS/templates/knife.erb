@@ -1,0 +1,11 @@
+current_dir = File.dirname(__FILE__)
+node_name                '${admin_user_name}'
+client_key               File.join current_dir, '../artifacts/keys', '${admin_user_name}.pem'
+validation_client_name   '${org_short_name}-validator'
+validation_key           File.join current_dir, '../artifacts/keys', '${org_short_name}-validator.pem'
+syntax_check_cache_path  File.join current_dir, 'syntax_check_cache'
+ssl_verify_mode          :verify_none
+cookbook_path [
+    (File.join current_dir, '../cookbooks'),
+]
+chef_server_url '${chef_server_url}'
