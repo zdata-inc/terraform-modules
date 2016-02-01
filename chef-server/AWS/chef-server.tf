@@ -80,3 +80,7 @@ resource "null_resource" "chef-knife" {
         command = "echo \"${template_file.knife-template.rendered}\" > .chef/knife.rb"
     }
 }
+
+output "public_ip" {
+    value = "${aws_instance.chef-server.public_ip}"
+}
