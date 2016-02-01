@@ -1,4 +1,4 @@
-resource "template_file" "chef-bootstrap" {
+resource "template_file" "chef-bootstrap-template" {
     template = "${file("${path.module}/templates/chef-bootstrap.erb.sh")}"
 
     vars {
@@ -9,16 +9,6 @@ resource "template_file" "chef-bootstrap" {
         admin_last_name = "${var.admin_last_name}"
         admin_email = "${var.admin_email}"
         org_full_name = "${var.org_full_name}"
-        org_short_name = "${var.org_short_name}"
-    }
-}
-
-resource "template_file" "knife-rb" {
-    template = "${file("${path.module}/templates/knife.erb")}"
-
-    vars {
-        chef_server_url = "https://${aws_instance.chef-server.public_ip}/organizations/${var.org_short_name}"
-        admin_user_name = "${var.admin_user_name}"
         org_short_name = "${var.org_short_name}"
     }
 }
@@ -44,7 +34,7 @@ resource "aws_instance" "chef-server" {
     provisioner "remote-exec" {
         inline = [
             "cat <<EOF > /tmp/chef-bootstrap.sh",
-            "${template_file.chef-bootstrap.rendered}",
+            "${template_file.chef-bootstrap-template.rendered}",
             "EOF",
             "chmod 755 /tmp/chef-bootstrap.sh",
             "/tmp/chef-bootstrap.sh",
@@ -52,7 +42,7 @@ resource "aws_instance" "chef-server" {
     }
 
     provisioner "local-exec" {
-        command = "mkdir -p ./.chef; mkdir -p ./artifacts/keys; cat <<EOF > .chef/knife.rb ${template_file.knife-rb.rendered} EOF"
+        command = "mkdir -p ./.chef; mkdir -p ./artifacts/keys"
     }
 
     provisioner "local-exec" {
@@ -64,10 +54,29 @@ resource "aws_instance" "chef-server" {
     }
 
     provisioner "local-exec" {
-        command = "if [ -d ./cookbooks -a -n `(ls -la ./cookbooks)` ]; then knife cookbook upload $(ls cookbooks)"
+        command = "if [ -d ./cookbooks -a -n `(ls -la ./cookbooks)` ]; then knife cookbook upload $(ls cookbooks); fi"
     }
 
     tags {
         Name = "chef-server"
+    }
+}
+
+resource "template_file" "knife-template" {
+    depends_on = ["aws_instance.chef-server"]
+    template = "${file("${path.module}/templates/knife.erb")}"
+
+    vars {
+        chef_server_url = "https://${aws_instance.chef-server.public_ip}/organizations/${var.org_short_name}"
+        admin_user_name = "${var.admin_user_name}"
+        org_short_name = "${var.org_short_name}"
+    }
+}
+
+resource "null_resource" "chef-knife" {
+    depends_on = ["template_file.knife-template"]
+
+    provisioner "local-exec" {
+        command = "echo \"${template_file.knife-template.rendered}\" > .chef/knife.rb"
     }
 }
