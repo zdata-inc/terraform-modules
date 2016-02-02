@@ -108,7 +108,7 @@ You shouldn't have to change these below, but here are the descriptions.
             node_name = "${format("node-%03d", count.index + 1)}"
             run_list = ["learn_chef_httpd::default"]
             server_url = "https://${module.chef-server.public_ip}/organizations/${var.chef_org_short_name}"
-            validation_client_name = "${chef_org_short_name}-validator"
+            validation_client_name = "${var.chef_org_short_name}-validator"
             validation_key = "${file("artifacts/keys/${var.chef_org_short_name}-validator.pem")}"
             ssl_verify_mode = ":verify_none"
         }
