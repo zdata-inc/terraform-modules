@@ -3,6 +3,13 @@
 ## Module List
 * chef-server/AWS - Deploys a full Chef server on the AWS cloud provider. If a cookbooks directory exists at the top-level directory of where this module is being referenced and contains cookbooks, then these cookbooks will also get automatically uploaded.
 
+## Basic Instructions
+* Add module to a Terraform file.
+* Configure variables and definitions.
+* Run 'terraform get' to download the module.
+* Run 'terraform plan' to verify it is going to create the module ok. 
+* Run 'terraform apply' to spin it up.
+
 ## Module Configuration Example for Chef-Server on AWS
 There are a couple files to update to get one of the modules to work. 
 
