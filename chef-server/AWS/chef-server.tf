@@ -54,7 +54,7 @@ resource "aws_instance" "chef-server" {
     }
 
     provisioner "local-exec" {
-        command = "if [ -d ./cookbooks -a -n `(ls -la ./cookbooks)` ]; then knife cookbook upload $(ls cookbooks); fi"
+        command = "if [ -d ./cookbooks -a -n \"`(ls -la ./cookbooks)`\" ]; then knife cookbook upload $(ls cookbooks); fi"
     }
 
     tags {
