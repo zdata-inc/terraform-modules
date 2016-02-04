@@ -53,10 +53,6 @@ resource "aws_instance" "chef-server" {
         command = "scp -i ${var.private_key_path} -o StrictHostKeyChecking=no ${var.ssh_user}@${aws_instance.chef-server.public_ip}:${var.org_short_name}-validator.pem ./artifacts/keys/."
     }
 
-    provisioner "local-exec" {
-        command = "if [ -d ./cookbooks -a -n \"`(ls -la ./cookbooks)`\" ]; then knife cookbook upload $(ls cookbooks); fi"
-    }
-
     tags {
         Name = "chef-server"
     }
@@ -78,6 +74,10 @@ resource "null_resource" "chef-knife" {
 
     provisioner "local-exec" {
         command = "echo \"${template_file.knife-template.rendered}\" > .chef/knife.rb"
+    }
+
+    provisioner "local-exec" {
+        command = "if [ -d ./cookbooks -a -n \"`(ls -la ./cookbooks)`\" ]; then knife cookbook upload $(ls cookbooks); fi"
     }
 }
 
