@@ -30,6 +30,13 @@ resource "aws_instance" "chef-server" {
         source = "${path.module}/templates/chef-server.rb"
         destination = "/tmp/chef-server.rb"
     }
+    
+    root_block_device {
+        volume_type = "standard"
+        volume_size = 50
+        iops = 0
+        delete_on_termination = "true"
+    }
 
     provisioner "remote-exec" {
         inline = [
